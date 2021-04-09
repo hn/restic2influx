@@ -48,10 +48,11 @@ die("Usage: $0 [-d] [-s] <restic repository> <influx db> [influx host]") if ( !$
 
 while ( my $line = <STDIN> ) {
 
-# {"message_type":"status","percent_done":0,"total_files":1,"total_bytes":60064}
-# {"message_type":"summary","files_new":0,"files_changed":0,"files_unmodified":8864,"dirs_new":0,"dirs ...
+    # {"message_type":"status","percent_done":0,"total_files":1,"total_bytes":60064}
+    # {"message_type":"summary","files_new":0,"files_changed":0,"files_unmodified":8864,"dirs_new":0,"dirs ...
 
-    my $message = decode_json($line) || next;
+    my $message;
+    eval { $message = decode_json($line); 1; } || next;
 
     if ( $message->{"message_type"} eq "status" ) {
         my $files = $message->{"total_files"};
