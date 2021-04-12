@@ -1,6 +1,6 @@
 # restic2influx
 
-Parse restic status output and feed summary to influx db.
+Parse [Restic](https://restic.net/) status output and feed summary to influx db.
 
 As a bonus, the program also shows the progress of the backup in the process list:
 ```
@@ -16,4 +16,15 @@ $ ps auwwf | grep restic
 ```
 $ restic backup --json <restic backup options> | restic2influx.pl [-d] [-s] <restic repository> <influx db> [influx host]
 ```
+
+## Grafana
+
+With [Grafana](https://grafana.com/) one can realize beautiful diagrams of the data:
+
+![Picture of an example Grafana dashboard](restic2influx-grafana.png "Grafana example dashboard")
+
+## Credits
+
+Forum user [griffon](https://forum.restic.net/u/griffon/) implemented a
+[similar approach](https://forum.restic.net/t/restic-grafana-dashboard/1662/8) using `jq`.
 
