@@ -14,7 +14,13 @@ $ ps auwwf | grep restic
 ## Usage
 
 ```
-$ restic backup --json <restic backup options> | restic2influx.pl [-d] [-s] <restic repository> <influx db> [influx host]
+$ restic backup --json <restic backup options> | restic2influx.pl [-d] [-s] [-p] <restic repository> <influx db> [influx host]
+
+-d, --debug      output debug info, do not send data to influxdb
+-s, --status=N   additionally send status information to influxdb every N seconds (default 30) during the backup job
+-p, --print      print summary to stdout
+
+'influx host' defaults to http://localhost:8086 if omitted
 ```
 
 ## Grafana
