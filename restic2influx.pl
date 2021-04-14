@@ -54,8 +54,12 @@ die("Usage: $0 [-d] [-s] [-p] <restic repository> <influx db> [influx host]") if
 
 while ( my $line = <STDIN> ) {
 
-    # {"message_type":"status","percent_done":0,"total_files":1,"total_bytes":60064}
-    # {"message_type":"summary","files_new":0,"files_changed":0,"files_unmodified":8864,"dirs_new":0,"dirs ...
+    # {"message_type":"status","seconds_elapsed":2,"percent_done":0.5780588424279393,"total_files":8864,
+    #  "files_done":2737,"total_bytes":157955039,"bytes_done":91307307}
+    #
+    # {"message_type":"summary","files_new":0,"files_changed":0,"files_unmodified":8864,"dirs_new":0,
+    #  "dirs_changed":0,"dirs_unmodified":986,"data_blobs":0,"tree_blobs":0,"data_added":0,"total_files_processed":8864,
+    #  "total_bytes_processed":157955039,"total_duration":3.742542353,"snapshot_id":"51a48509"}
 
     my $now = time();
     my $message;
@@ -65,19 +69,25 @@ while ( my $line = <STDIN> ) {
     my $influxreq;
 
     if ( $type eq "status" ) {
-        my $files = $message->{"total_files"};
-        while ( $files =~ s/(\d+)(\d\d\d)/$1\.$2/ ) { };   # add thousands separator
-        my $mbytes = int ( $message->{"total_bytes"} / 1048576 );
-        while ( $mbytes =~ s/(\d+)(\d\d\d)/$1\.$2/ ) { }
+        my $total_files = $message->{"total_files"};
+        while ( $total_files =~ s/(\d+)(\d\d\d)/$1\.$2/ ) { };   # add thousands separator
+        my $files_done = $message->{"files_done"} || 0;
+        while ( $files_done =~ s/(\d+)(\d\d\d)/$1\.$2/ ) { };
+        my $total_mbytes = int ( $message->{"total_bytes"} / 1048576 );
+        while ( $total_mbytes =~ s/(\d+)(\d\d\d)/$1\.$2/ ) { }
+        my $mbytes_done = int ( $message->{"bytes_done"} / 1048576 );
+        while ( $mbytes_done =~ s/(\d+)(\d\d\d)/$1\.$2/ ) { }
         my $percent = $message->{"percent_done"};
+        my $elapsed = $message->{"seconds_elapsed"};
         $0 = "restic2influx " . $repo
           . " [Done: " . sprintf( "%.2f%%", $percent * 100 )
-          . " ETA: " . ( ( $percent > 0 ) ? strftime "%m-%d %H:%M", localtime( $start + ( ( $now - $start ) / $percent ) ) : "unknown" )
-          . " Files: " . $files
-          . " MBytes: " . $mbytes . "]";
+          . " ETA: " . ( ( $percent > 0 ) ? strftime "%m-%d %H:%M", localtime( $now - $elapsed + ( $elapsed / $percent ) ) : "unknown" )
+          . " Files: " . $files_done . "/" . $total_files
+          . " MBytes: " . $mbytes_done . "/" . $total_mbytes . "]";
 
         if ($status && (($now - $lastreq) > $status)) {
             $lastreq = $now;
+            $message->{"percent_done"} = "0.0" if (!$message->{"percent_done"});	# fix int vs. float
             $influxreq = data2line(
                 'restic',
                 $message,
