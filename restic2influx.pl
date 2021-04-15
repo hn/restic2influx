@@ -87,7 +87,7 @@ while ( my $line = <STDIN> ) {
 
         if ($status && (($now - $lastreq) > $status)) {
             $lastreq = $now;
-            $message->{"percent_done"} = "0.0" if (!$message->{"percent_done"});	# fix int vs. float
+            $message->{"percent_done"} .= ".0" unless ($message->{"percent_done"} =~ /\./);	# force float
             $influxreq = data2line(
                 'restic',
                 $message,
