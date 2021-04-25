@@ -4,7 +4,7 @@ Parse [Restic](https://restic.net/) status output and feed summary to influx db.
 
 As a bonus, the program also shows the progress of the backup in the process list:
 ```
-$ ( restic backup --json -r /path/to/backup /path/to/MyMusic | restic2influx.pl MyMusic grafana http://influxsrv:8086 ) &
+$ ( restic backup --json -r /path/to/backup /path/to/MyMusic | restic2influx -s MyMusic grafana http://influxsrv:8086 ) &
 
 $ ps auwwf | grep restic
  18:06 0:01  |  restic backup --json -r /path/to/backup /path/to/MyMusic
@@ -14,11 +14,11 @@ $ ps auwwf | grep restic
 ## Usage
 
 ```
-$ restic backup --json <restic backup options> | restic2influx.pl [-d] [-s] [-p] <restic repository> <influx db> [influx host]
+$ restic backup --json <restic backup options> | restic2influx [-d] [-v] [-s] <restic repository> <influx db> [influx host]
 
+-s, --status[=N] additionally send status information to influxdb every N seconds (default 30) during the backup job
+-v, --verbose    print summary and other info to stdout
 -d, --debug      output debug info, do not send data to influxdb
--s, --status=N   additionally send status information to influxdb every N seconds (default 30) during the backup job
--p, --print      print summary to stdout
 
 'influx host' defaults to http://localhost:8086 if omitted
 ```
@@ -31,6 +31,10 @@ With [Grafana](https://grafana.com/) one can realize beautiful diagrams of the d
 
 ## Credits
 
-Forum user [griffon](https://forum.restic.net/u/griffon/) implemented a
+- Forum user [griffon](https://forum.restic.net/u/griffon/) implemented a
 [similar approach](https://forum.restic.net/t/restic-grafana-dashboard/1662/8) using `jq`.
+
+- Similiar Grafana dashboards by [dmatt](https://grafana.com/grafana/dashboards/11064) and
+[Alexander](https://grafana.com/grafana/dashboards/4198) using
+[runrestic](https://pypi.org/project/runrestic/).
 
