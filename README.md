@@ -25,7 +25,9 @@ $ restic backup --json <restic backup options> | restic2influx [-d] [-v] [-s] <r
 
 ## Grafana
 
-With [Grafana](https://grafana.com/) one can realize beautiful diagrams of the data:
+With [Grafana](https://grafana.com/) one can realize beautiful diagrams of the
+data, feel free to [download dashboard example](restic2influx-grafana.json)
+and modify it according to your needs:
 
 ![Picture of an example Grafana dashboard](restic2influx-grafana.png "Grafana example dashboard")
 

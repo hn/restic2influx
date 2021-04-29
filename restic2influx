@@ -42,8 +42,7 @@ my $lastreq;
 
 GetOptions ("debug|d+"    => \$debug,
             "verbose|v+"  => \$verbose,
-            "status|s:30" => \$status,
-            "debug"       => \$debug
+            "status|s:30" => \$status
             ) || die( "Error in command line arguments\n" );
 
 $repo = shift(@ARGV);
