@@ -84,7 +84,7 @@ while ( my $line = <STDIN> ) {
         my $remaining = $message->{"seconds_remaining"};
         $0 = "restic2influx " . $repo
           . " [Done: " . sprintf( "%.2f%%", $percent * 100 )
-          . " ETA: " . ( ( $remaining ) ? strftime("%m-%d %H:%M", localtime( $now + $remaining )) : "unknown" )
+          . " ETA: " . ( ( $remaining > 0 && $remaining < 42000042 ) ? strftime("%m-%d %H:%M", localtime( $now + $remaining )) : "unknown" )
           . " Files: " . $files_done . "/" . $total_files
           . " MBytes: " . $mbytes_done . "/" . $total_mbytes . "]";
 
