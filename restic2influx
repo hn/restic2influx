@@ -28,6 +28,7 @@ use POSIX qw(strftime);
 use JSON qw(decode_json);
 use InfluxDB::LineProtocol qw(data2line);
 use LWP::UserAgent;
+use HTTP::Request::Common;
 use Getopt::Long;
 
 my $debug;
@@ -36,20 +37,24 @@ my $status;
 my $repo;
 my $influxdb;
 my $influxhost = 'http://localhost:8086';
+my $influxuser;
+my $influxpass;
 
 my $start = time();
 my $lastreq;
 
-GetOptions ("debug|d+"    => \$debug,
-            "verbose|v+"  => \$verbose,
-            "status|s:30" => \$status
+GetOptions ("debug|d+"     => \$debug,
+            "verbose|v+"   => \$verbose,
+            "status|s:30"  => \$status,
+            "user|u=s"     => \$influxuser,
+            "password|p=s" => \$influxpass
             ) || die( "Error in command line arguments\n" );
 
 $repo = shift(@ARGV);
 $influxdb = shift(@ARGV);
 $influxhost = shift(@ARGV) if (@ARGV);
 
-die("Usage: $0 [-d] [-v] [-s] <restic repository> <influx db> [influx host]") if ( !$repo || !$influxdb);
+die("Usage: $0 [-d] [-v] [-s] [-u user] [-p password] <restic repository> <influx db> [influx host]") if ( !$repo || !$influxdb);
 
 while ( my $line = <STDIN> ) {
 
@@ -149,11 +154,11 @@ while ( my $line = <STDIN> ) {
         print $influxreq . "\n";
     } else {
         my $ua       = LWP::UserAgent->new();
-        my $response = $ua->post(
-            $influxhost . '/write?precision=ns&db=' . $influxdb,
-            'Content_Type' => 'application/x-www-form-urlencoded',
-            'Content'      => $influxreq
-        );
+        my $request = POST $influxhost . '/write?precision=ns&db=' . $influxdb, Content => $influxreq;
+        if ($influxuser && $influxpass) {
+            $request->authorization_basic($influxuser, $influxpass);
+        }
+        my $response = $ua->request($request);
         print $response->status_line . "\n" . $response->headers()->as_string if ($debug>1);    # HTTP 204 is ok
     }
 

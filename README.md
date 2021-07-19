@@ -19,6 +19,8 @@ $ restic backup --json <restic backup options> | restic2influx [-d] [-v] [-s] <r
 -s, --status[=N] additionally send status information to influxdb every N seconds (default 30) during the backup job
 -v, --verbose    print summary and other info to stdout
 -d, --debug      output debug info, do not send data to influxdb
+-u, --user       influxdb basic auth user
+-p, --password   influxdb basic auth password
 
 'influx host' defaults to http://localhost:8086 if omitted
 ```
