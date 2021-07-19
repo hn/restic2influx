@@ -25,6 +25,9 @@ $ restic backup --json <restic backup options> | restic2influx [-d] [-v] [-s] <r
 'influx host' defaults to http://localhost:8086 if omitted
 ```
 
+Before using it, you need to install some non-core libraries, i.e. on Debian systems
+simply execute: `apt-get install libjson-perl libinfluxdb-lineprotocol-perl libwww-perl`.
+
 ## Grafana
 
 With [Grafana](https://grafana.com/) one can realize beautiful diagrams of the
