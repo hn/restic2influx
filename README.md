@@ -45,3 +45,6 @@ and modify it according to your needs:
 [Alexander](https://grafana.com/grafana/dashboards/4198) using
 [runrestic](https://pypi.org/project/runrestic/).
 
+- [Autorestic](https://github.com/cupcakearmy/autorestic) might be helpful
+  as well.
+

@@ -21,7 +21,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/gpl-3.0.txt>.
 #
 
-# apt-get install libjson-perl libinfluxdb-lineprotocol-perl libwww-perl
+# apt-get install libjson-perl libinfluxdb-lineprotocol-perl libwww-perl libtext-unidecode-perl
 
 use strict;
 use POSIX qw(strftime);
@@ -30,6 +30,7 @@ use InfluxDB::LineProtocol qw(data2line);
 use LWP::UserAgent;
 use HTTP::Request::Common;
 use Getopt::Long;
+use Text::Unidecode;
 
 my $debug;
 my $verbose;
@@ -40,7 +41,6 @@ my $influxhost = 'http://localhost:8086';
 my $influxuser;
 my $influxpass;
 
-my $start = time();
 my $lastreq;
 
 GetOptions ("debug|d+"     => \$debug,
@@ -98,7 +98,7 @@ while ( my $line = <STDIN> ) {
             print $0 . "\n" if ($debug>1);
             $message->{"percent_done"} .= ".0" unless ($percent =~ /\./);			# force float
             if (ref($message->{"current_files"}) eq 'ARRAY') {
-                $message->{"current_files"} = join(", ", @{$message->{"current_files"}});	# flatten file list
+                $message->{"current_files"} = join(", ", map { unidecode($_) } @{$message->{"current_files"}});	# flatten file list
             }
             $influxreq = data2line(
                 'restic',
@@ -153,13 +153,15 @@ while ( my $line = <STDIN> ) {
     if ($debug) {
         print $influxreq . "\n";
     } else {
-        my $ua       = LWP::UserAgent->new();
+        my $ua = LWP::UserAgent->new();
         my $request = POST $influxhost . '/write?precision=ns&db=' . $influxdb, Content => $influxreq;
         if ($influxuser && $influxpass) {
             $request->authorization_basic($influxuser, $influxpass);
         }
         my $response = $ua->request($request);
-        print $response->status_line . "\n" . $response->headers()->as_string if ($debug>1);    # HTTP 204 is ok
+        if (!($response->is_success) || ($debug>1)) {
+            print $response->status_line . "\n" . $response->headers()->as_string;    # HTTP 204 is ok
+        }
     }
 
 }
