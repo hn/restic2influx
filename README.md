@@ -26,7 +26,7 @@ $ restic backup --json <restic backup options> | restic2influx [-d] [-v] [-s] <r
 ```
 
 Before using it, you need to install some non-core libraries, i.e. on Debian systems
-simply execute: `apt-get install libjson-perl libinfluxdb-lineprotocol-perl libwww-perl`.
+simply execute: `apt-get install libjson-perl libinfluxdb-lineprotocol-perl libwww-perl libtext-unidecode-perl`.
 
 ## Grafana
 
